@@ -1,0 +1,3 @@
+# Change the interval of when the job runs.
+# The job will only export newer data since last run.
+*/10 * * * * cd /home/fusion_exporter/ && python fusion_exporter.py > /tmp/fusion_exporter.out 2>&1

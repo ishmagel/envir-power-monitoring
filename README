@@ -1,0 +1,26 @@
+fusion_exporter.py - Program to read from Envir db and send to Fusion tables.
+charts.html - HTML page for visualising data from Fusion table.
+cron - File to set up cron job for running exporter regularly.
+
+1. Create two Fusion tables; one for Power and one for Temperature.
+  a. For Power, make a copy of this template: https://www.google.com/fusiontables/DataSource?docid=1dbVgYcR-oMjkI72bNP_JIoO7486xW3CDxZVLEaU
+     Add/Remove ch* columns to fit your setup.
+  b. For Temperature, make a copy of this template: https://www.google.com/fusiontables/data?docid=1yFM-hTszcGJa2UMLSCSTxiQvHDH1AbOp5L2vUqo
+
+2. Create folder on the server where the Envir database resides and check out the code.
+
+4. Go to https://code.google.com/apis/console.
+
+4. Enable Fusion Tables API in Services.
+
+5. Create an OAuth 2.0 account in Accounts.
+
+6. Click "Download JSON" and save "client_secrets.json" in the same folder.
+
+7. Modify "fusion-exporter.py" and "charts.html" as documented in the files.
+
+8. Run the exporter once: "python fusion_exporter.py". You should now see data in the Fusion tables.
+
+9. Set up a cron job by running "crontab cron".
+
+10. Open charts.html in your browser and see the results.

@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Electricity Monitoring
+    </title>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('jquery', '1');
+      google.load('visualization', '1');
+    </script>
+    <script type="text/javascript">
+      // Document IDs for Fusion tables:
+      // https://www.google.com/fusiontables/DataSource?docid=<ID>.
+      // Ensure that the tables are publicly available.
+      var TABLE_IDS = {
+        'power': '1dbVgYcR-oMjkI72bNP_JIoO7486xW3CDxZVLEaU',
+        'temperature': '1yFM-hTszcGJa2UMLSCSTxiQvHDH1AbOp5L2vUqo'
+      };
+      // API key from Simple API Access:
+      // https://code.google.com/apis/console/b/0/?pli=1#:access
+      var apikey = 'AIzaSyAO5e7lVESTnDJr9iTnIjCtNaLlCf5tG8Y';
+
+      /*
+       * Get data from Fusion table and call callback on completion.
+       */
+      function getData(query, f) {
+        var encodedQuery = encodeURIComponent(query);
+
+        // Construct the URL
+        var url = ['https://www.googleapis.com/fusiontables/v1/query'];
+        url.push('?sql=' + encodedQuery);
+        url.push('&key=' + apikey);
+        url.push('&callback=?');
+
+        // Send the JSONP request using jQuery
+        $.ajax({
+          url: url.join(''),
+          dataType: 'json',
+          success: function (data) {
+            f(data);
+          }
+        });
+      }
+
+      /*
+       * Render Power chart with given data.
+       */
+      function renderPower(data) {
+        var dataTable = new google.visualization.DataTable();
+
+        // Columns from data are ['event_timestamp', 'channel_no', ['ch*']].
+        dataTable.addColumn('datetime');
+        // Skip column 'channel_no'.
+        for (var i = 2; i < data.columns.length; ++i) {
+          dataTable.addColumn('number', 'Channel ' + i);
+        }
+        // Add a column for total value.
+        dataTable.addColumn('number', 'Total');
+        for(var r in data.rows) {
+          var row = data.rows[r];
+          var a = [];
+          // Ensure date is in UTC so JS can convert to local time.
+          a.push(new Date(row[0] + ' UTC'));
+
+          // Calculate sum.
+          var sum = 0;
+          for (var i = 2; i < data.columns.length; ++i) {
+            val = parseInt(row[i])
+            a.push(val);
+            sum += val;
+          }
+          a.push(sum);
+          dataTable.addRow(a);
+        }
+
+        var wrapper = new google.visualization.ChartWrapper({
+          chartType: 'AnnotatedTimeLine',
+          containerId: 'visualization_power',
+          options: {
+            'allValuesSuffix': ' Watts',
+            'dateFormat': 'HH:mm:ss MMMM dd, yyyy',
+            'isStacked': true,
+            'scaleType': 'maximized',
+          }
+        });
+
+        wrapper.setDataTable(dataTable);
+        wrapper.draw();
+      }
+      
+      function renderTemperature(data) {
+        var dataTable = new google.visualization.DataTable();
+
+        // Columns from data are ['event_timestamp', 'value'].
+        dataTable.addColumn('datetime');
+        dataTable.addColumn('number');
+        for(var r in data.rows) {
+          var row = data.rows[r];
+          var a = [];
+          // Ensure date is in UTC so JS can convert to local time.
+          a.push(new Date(row[0] + ' UTC'));
+          a.push(parseFloat(row[1]));
+          dataTable.addRow(a);
+        }
+
+        var wrapper = new google.visualization.ChartWrapper({
+          chartType: 'AnnotatedTimeLine',
+          containerId: 'visualization_temperature',
+          options: {
+            'allValuesSuffix': ' °C',
+            'dateFormat': 'HH:mm:ss MMMM dd, yyyy',
+            'isStacked': true,
+            'scaleType': 'maximized',
+          }
+        });
+
+        wrapper.setDataTable(dataTable);
+        wrapper.draw();
+      }
+
+      function renderVisualization() {
+        // To ensure this project can handle an arbitrary number of channels,
+        // we need to select all.
+        var query = 'SELECT * FROM ' + TABLE_IDS['power'] +
+          ' WHERE channel_no = 0';
+
+        getData(query, renderPower);
+        var query = 'SELECT event_timestamp, value FROM ' +
+          TABLE_IDS['temperature'];
+        getData(query, renderTemperature);
+      }
+
+      google.setOnLoadCallback(renderVisualization);
+    </script>
+  </head>
+  <body>
+    <div id="visualization_power" style="height:300px;"></div>
+    <div id="visualization_temperature" style="height:300px;"></div>
+  </body>
+</html>
+
