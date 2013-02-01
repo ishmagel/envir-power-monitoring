@@ -15,7 +15,7 @@ Steps:
 
 2. Create folder on the server where the Envir database resides and check out the code.
 
-4. Go to https://code.google.com/apis/console.
+3. Go to https://code.google.com/apis/console.
 
 4. Enable Fusion Tables API in Services.
 
