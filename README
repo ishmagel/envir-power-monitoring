@@ -1,6 +1,12 @@
-fusion_exporter.py - Program to read from Envir db and send to Fusion tables.
-charts.html - HTML page for visualising data from Fusion table.
-cron - File to set up cron job for running exporter regularly.
+Program to export data from Envir to Fusion tables.
+
+Files:
+
+* fusion_exporter.py - Program to read from Envir db and send to Fusion tables.
+* charts.html - HTML page for visualising data from Fusion table.
+* cron - File to set up cron job for running exporter regularly.
+
+Steps:
 
 1. Create two Fusion tables; one for Power and one for Temperature.
   a. For Power, make a copy of this template: https://www.google.com/fusiontables/DataSource?docid=1dbVgYcR-oMjkI72bNP_JIoO7486xW3CDxZVLEaU
